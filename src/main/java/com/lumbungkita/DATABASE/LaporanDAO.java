@@ -39,27 +39,28 @@ public class LaporanDAO {
         return list;
     }
 
-    // metode untuk mengambil laporan penjualan dari database
     public List<LaporanPenjualan> getLaporanPenjualan() {
         List<LaporanPenjualan> list = new ArrayList<>();
-        // sql query untuk mengambil data laporan penjualan dengan join ke tabel pembeli
-        String query = "SELECT t.id_transaksi, t.tanggal_waktu_transaksi, p.nama_pembeli, t.total_harga_transaksi " +
+        
+        String query = "SELECT t.id_transaksi, t.tanggal_waktu_transaksi, p.nama_pembeli, t.total_harga_transaksi, " +
+                       "SUM(d.jumlah_pembelian) as total_barang " + 
                        "FROM transaksi t " +
                        "JOIN pembeli p ON t.id_pembeli = p.id_pembeli " +
+                       "JOIN detail_transaksi d ON t.id_transaksi = d.id_transaksi " + 
+                       "GROUP BY t.id_transaksi " + 
                        "ORDER BY t.tanggal_waktu_transaksi DESC";
 
-        // try-with-resources untuk koneksi database
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            // perulangan untuk mengambil data dari result set
             while (rs.next()) {
                 list.add(new LaporanPenjualan(
                     rs.getInt("id_transaksi"),
                     rs.getTimestamp("tanggal_waktu_transaksi"),
                     rs.getString("nama_pembeli"),
-                    rs.getDouble("total_harga_transaksi")
+                    rs.getDouble("total_harga_transaksi"),
+                    rs.getInt("total_barang")
                 ));
             }
         } catch (SQLException e) {
@@ -71,7 +72,6 @@ public class LaporanDAO {
     // metode untuk mengambil laporan per produk dari database
     public List<LaporanPerProduk> getLaporanPerProduk() {
         List<LaporanPerProduk> list = new ArrayList<>();
-        // sql query untuk mengambil data laporan per produk dengan agregasi
         String query = "SELECT h.nama_hasil_panen, " +
                        "SUM(d.jumlah_pembelian) as total_terjual, " +
                        "h.harga_jual, " +
@@ -80,12 +80,10 @@ public class LaporanDAO {
                        "JOIN hasil_panen h ON d.id_panen = h.id_panen " +
                        "GROUP BY h.id_panen, h.nama_hasil_panen, h.harga_jual";
         
-        // try-with-resources untuk koneksi database
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            // perulangan untuk mengambil data dari result set
             while (rs.next()) {
                 list.add(new LaporanPerProduk(
                     rs.getString("nama_hasil_panen"),
