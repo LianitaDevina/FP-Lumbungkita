@@ -7,7 +7,7 @@ import java.util.List;
 
 public class HasilPanenDAO {
 
-    // --- BAGIAN 1: UNTUK TRANSAKSI (Pencarian ID) ---
+    // method pencarian id
     public HasilPanen getHasilPanenById(int id) {
         String sql = "SELECT * FROM hasil_panen WHERE id_panen = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -32,7 +32,7 @@ public class HasilPanenDAO {
         return null;
     }
 
-    // --- BAGIAN 2: UNTUK CONTROLLER HASIL PANEN (CRUD) ---
+    // controller hasil panen (CRUD)
 
     // Mengambil Semua Data
     public List<HasilPanen> getAllHasilPanen() {
@@ -57,7 +57,7 @@ public class HasilPanenDAO {
         return list;
     }
 
-    // Menambah Data (INI YANG MENYEBABKAN ERROR DI SCREENSHOT ANDA JIKA HILANG)
+    // Menambah Data
     public void addHasilPanenById(HasilPanen hp) {
         String sql = "INSERT INTO hasil_panen (nama_hasil_panen, jenis_hasil_panen, harga_jual, stok, id_petani) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -98,6 +98,24 @@ public class HasilPanenDAO {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // pengurangan stok
+    public void kurangiStok(int idPanen, int jumlahDibeli) {
+        String sql = "UPDATE hasil_panen SET stok = stok - ? WHERE id_panen = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setInt(1, jumlahDibeli); 
+            ps.setInt(2, idPanen);
+            
+            ps.executeUpdate();
+            
+        } catch (SQLException e) {
+            System.err.println("Gagal mengurangi stok: " + e.getMessage());
             e.printStackTrace();
         }
     }

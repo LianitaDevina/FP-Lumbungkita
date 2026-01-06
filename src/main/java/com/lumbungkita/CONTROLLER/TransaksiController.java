@@ -1,6 +1,7 @@
 package com.lumbungkita.CONTROLLER;
 
 import com.lumbungkita.DATABASE.HasilPanenDAO;
+import com.lumbungkita.DATABASE.PembeliDAO; // <--- Import Baru
 import com.lumbungkita.DATABASE.TransaksiDAO;
 import com.lumbungkita.MODEL.DetailTransaksi;
 import com.lumbungkita.MODEL.HasilPanen;
@@ -32,6 +33,7 @@ public class TransaksiController {
     // --- VARIABEL DATA ---
     private TransaksiDAO transaksiDAO;
     private HasilPanenDAO hasilPanenDAO;
+    private PembeliDAO pembeliDAO; // <--- Tambahan Variabel
     private ObservableList<KeranjangItem> listKeranjang;
     private double totalBayarBersih = 0;
 
@@ -41,6 +43,7 @@ public class TransaksiController {
             // Inisialisasi DAO & List
             transaksiDAO = new TransaksiDAO();
             hasilPanenDAO = new HasilPanenDAO();
+            pembeliDAO = new PembeliDAO(); // <--- Inisialisasi DAO Pembeli
             listKeranjang = FXCollections.observableArrayList();
 
             // Setup Kolom Tabel
@@ -62,10 +65,9 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL TAMBAH ---
+    // --- ACTION: TOMBOL TAMBAH (TIDAK BERUBAH) ---
     @FXML
     private void handleTambah() {
-        // 1. Validasi Input Kosong
         if (tfIdPanen.getText().isEmpty() || tfJumlah.getText().isEmpty()) {
             showAlert("Peringatan", "ID Panen dan Jumlah harus diisi.");
             return;
@@ -75,13 +77,11 @@ public class TransaksiController {
             int idPanen = Integer.parseInt(tfIdPanen.getText());
             int jumlahBeli = Integer.parseInt(tfJumlah.getText());
 
-            // 2. Validasi Jumlah Positif
             if (jumlahBeli <= 0) {
                 showAlert("Peringatan", "Jumlah pembelian harus lebih dari 0.");
                 return;
             }
 
-            // 3. Cek Database
             HasilPanen panen = hasilPanenDAO.getHasilPanenById(idPanen);
             
             if (panen == null) {
@@ -89,13 +89,11 @@ public class TransaksiController {
                 return;
             }
 
-            // 4. Cek Stok
             if (jumlahBeli > panen.getStok()) {
                 showAlert("Stok Kurang", "Stok " + panen.getNamaHasilPanen() + " sisa: " + panen.getStok());
                 return;
             }
 
-            // 5. Masukkan ke Keranjang
             KeranjangItem item = new KeranjangItem(
                 panen.getIdPanen(),
                 panen.getNamaHasilPanen(),
@@ -106,7 +104,6 @@ public class TransaksiController {
             listKeranjang.add(item);
             hitungTotal();
 
-            // 6. Reset Input Barang
             tfIdPanen.clear();
             tfJumlah.clear();
             tfIdPanen.requestFocus(); 
@@ -119,7 +116,7 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL HAPUS ITEM ---
+    // --- ACTION: HAPUS ITEM (TIDAK BERUBAH) ---
     @FXML
     private void handleHapusItem() {
         KeranjangItem selected = tblKeranjang.getSelectionModel().getSelectedItem();
@@ -131,7 +128,7 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL CHECKOUT ---
+    // --- ACTION: CHECKOUT (LOGIKA DISKON DITAMBAHKAN DI SINI) ---
     @FXML
     private void handleCheckout() {
         if (listKeranjang.isEmpty()) {
@@ -145,19 +142,54 @@ public class TransaksiController {
 
         try {
             int idPembeli = Integer.parseInt(tfIdPembeli.getText());
-            List<DetailTransaksi> listDetail = new ArrayList<>();
 
-            // Konversi dari ObservableList ke List<DetailTransaksi>
+            // --- LOGIKA DISKON DIMULAI ---
+            
+            // 1. Cek Kategori Pembeli
+            String kategori = pembeliDAO.getKategoriPembeli(idPembeli);
+            double totalAkhirTransaksi = totalBayarBersih; // Default harga normal
+            boolean isReseller = false;
+
+            // 2. Jika Reseller, potong 15%
+            if (kategori != null && kategori.equalsIgnoreCase("reseller")) {
+                isReseller = true;
+                double diskon = totalBayarBersih * 0.15;
+                totalAkhirTransaksi = totalBayarBersih - diskon;
+            }
+
+            // 3. Konfirmasi ke User (Opsional, agar terlihat sistem bekerja)
+            String pesanKonfirmasi = "Total: Rp " + String.format("%,.2f", totalBayarBersih);
+            if (isReseller) {
+                pesanKonfirmasi += "\nDiskon Reseller (15%): -Rp " + String.format("%,.2f", (totalBayarBersih * 0.15));
+                pesanKonfirmasi += "\nTotal Bayar: Rp " + String.format("%,.2f", totalAkhirTransaksi);
+            }
+            
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Konfirmasi Pembayaran");
+            alert.setHeaderText("Status Pembeli: " + kategori);
+            alert.setContentText(pesanKonfirmasi + "\n\nLanjutkan transaksi?");
+            if (alert.showAndWait().get() != ButtonType.OK) {
+                return; // Batal jika user menekan Cancel
+            }
+            // --- LOGIKA DISKON SELESAI ---
+
+
+            List<DetailTransaksi> listDetail = new ArrayList<>();
+            // Siapkan Data Detail
             for (KeranjangItem item : listKeranjang) {
-                // Constructor DetailTransaksi
                 listDetail.add(new DetailTransaksi(0, item.getQuantity(), item.getSubtotal(), 0, item.getIdPanen()));
             }
 
-            // Simpan ke Database
-            boolean sukses = transaksiDAO.simpanTransaksi(idPembeli, totalBayarBersih, listDetail);
+            // 4. Simpan Transaksi (Kirim totalAkhirTransaksi yg sudah didiskon)
+            boolean sukses = transaksiDAO.simpanTransaksi(idPembeli, totalAkhirTransaksi, listDetail);
 
             if (sukses) {
-                showAlert("Berhasil", "Transaksi berhasil disimpan!");
+                // Update Stok
+                for (KeranjangItem item : listKeranjang) {
+                    hasilPanenDAO.kurangiStok(item.getIdPanen(), item.getQuantity());
+                }
+                
+                showAlert("Berhasil", "Transaksi berhasil! Total Bayar: Rp " + String.format("%,.2f", totalAkhirTransaksi));
                 resetForm();
             } else {
                 showAlert("Gagal", "Terjadi kesalahan saat menyimpan ke database.");
