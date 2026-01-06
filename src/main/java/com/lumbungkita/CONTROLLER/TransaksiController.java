@@ -146,7 +146,7 @@ public class TransaksiController {
             // --- LOGIKA DISKON DIMULAI ---
             
             // 1. Cek Kategori Pembeli
-            String kategori = pembeliDAO.getKategoriPembeli(idPembeli);
+            String kategori = pembeliDAO.getTipePembeli(idPembeli);
             double totalAkhirTransaksi = totalBayarBersih; // Default harga normal
             boolean isReseller = false;
 
