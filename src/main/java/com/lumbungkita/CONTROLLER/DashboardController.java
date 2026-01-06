@@ -48,7 +48,7 @@ public class DashboardController {
     // method untuk menampilkan halaman Transaksi
     @FXML
     void showTransaksi(ActionEvent event) {
-        System.out.println("Menu Transaksi diklik (File belum ada)");
+        loadPage("TransaksiView");
     }
 
     // method untuk menampilkan halaman Laporan
