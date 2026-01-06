@@ -1,6 +1,7 @@
 package com.lumbungkita.CONTROLLER;
 
 import com.lumbungkita.DATABASE.HasilPanenDAO;
+import com.lumbungkita.DATABASE.PembeliDAO; // <--- Import Baru
 import com.lumbungkita.DATABASE.TransaksiDAO;
 import com.lumbungkita.MODEL.DetailTransaksi;
 import com.lumbungkita.MODEL.HasilPanen;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class TransaksiController {
 
-    // Komponen FXML 
+    // Komponen FXML
     @FXML private TextField tfIdPembeli;
     @FXML private TextField tfIdPanen;
     @FXML private TextField tfJumlah;
@@ -32,6 +33,7 @@ public class TransaksiController {
     // Variabel data
     private TransaksiDAO transaksiDAO;
     private HasilPanenDAO hasilPanenDAO;
+    private PembeliDAO pembeliDAO; 
     private ObservableList<KeranjangItem> listKeranjang;
     private double totalBayarBersih = 0;
 
@@ -41,6 +43,7 @@ public class TransaksiController {
             // Inisialisasi DAO & list
             transaksiDAO = new TransaksiDAO();
             hasilPanenDAO = new HasilPanenDAO();
+            pembeliDAO = new PembeliDAO(); 
             listKeranjang = FXCollections.observableArrayList();
 
             // Setup kolom tabel
@@ -53,7 +56,7 @@ public class TransaksiController {
             // Hubungkan list ke tabel
             tblKeranjang.setItems(listKeranjang);
             
-            // Set total awal
+            // Set nilai total awal
             lblTotalBayar.setText("Rp 0,00");
 
         } catch (Exception e) {
@@ -136,23 +139,51 @@ public class TransaksiController {
 
         try {
             int idPembeli = Integer.parseInt(tfIdPembeli.getText());
-            List<DetailTransaksi> listDetail = new ArrayList<>();
 
-            // Siapkan Data Detail
+            // Logika diskon
+            
+            // Cek kategori pembeli
+            String kategori = pembeliDAO.getKategoriPembeli(idPembeli);
+            double totalAkhirTransaksi = totalBayarBersih; // Default harga normal
+            boolean isReseller = false;
+
+            // Jika reseller, diskon 15%
+            if (kategori != null && kategori.equalsIgnoreCase("Reseller")) {
+                isReseller = true;
+                double diskon = totalBayarBersih * 0.15;
+                totalAkhirTransaksi = totalBayarBersih - diskon;
+            }
+
+            String pesanKonfirmasi = "Total: Rp " + String.format("%,.2f", totalBayarBersih);
+            if (isReseller) {
+                pesanKonfirmasi += "\nDiskon Reseller (15%): -Rp " + String.format("%,.2f", (totalBayarBersih * 0.15));
+                pesanKonfirmasi += "\nTotal Bayar: Rp " + String.format("%,.2f", totalAkhirTransaksi);
+            }
+            
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Konfirmasi Pembayaran");
+            alert.setHeaderText("Status Pembeli: " + kategori);
+            alert.setContentText(pesanKonfirmasi + "\n\nLanjutkan transaksi?");
+            if (alert.showAndWait().get() != ButtonType.OK) {
+                return; 
+            }
+
+
+            List<DetailTransaksi> listDetail = new ArrayList<>();
             for (KeranjangItem item : listKeranjang) {
                 listDetail.add(new DetailTransaksi(0, item.getQuantity(), item.getSubtotal(), 0, item.getIdPanen()));
             }
 
-            // 1. Simpan Transaksi
-            boolean sukses = transaksiDAO.simpanTransaksi(idPembeli, totalBayarBersih, listDetail);
+            // Simpan transaksi 
+            boolean sukses = transaksiDAO.simpanTransaksi(idPembeli, totalAkhirTransaksi, listDetail);
 
             if (sukses) {
+                // Update Stok
                 for (KeranjangItem item : listKeranjang) {
                     hasilPanenDAO.kurangiStok(item.getIdPanen(), item.getQuantity());
                 }
                 
-
-                showAlert("Berhasil", "Transaksi disimpan & Stok otomatis diperbarui!");
+                showAlert("Berhasil", "Transaksi berhasil! Total Bayar: Rp " + String.format("%,.2f", totalAkhirTransaksi));
                 resetForm();
             } else {
                 showAlert("Gagal", "Terjadi kesalahan saat menyimpan ke database.");
@@ -187,4 +218,3 @@ public class TransaksiController {
         alert.showAndWait();
     }
 }
-
