@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lumbungkita.CONTROLLER.DashboardController">
+   <left>
+      <VBox prefHeight="200.0" prefWidth="200.0" spacing="15.0" style="-fx-background-color: #263238;" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" minWidth="200.0" text="MENU UTAMA" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </Label>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showPetani" style="-fx-background-color: #4CAF50; -fx-font-weight: bold;" text="Data Petani" textFill="WHITE" />
+            <Button layoutX="10.0" layoutY="40.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showPembeli" style="-fx-background-color: #2196F3; -fx-font-weight: bold;" text="Data Pembeli" textFill="WHITE" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showHasilPanen" style="-fx-background-color: #FFFF00; -fx-font-weight: bold;" text="Hasil Panen" />
+            <Button layoutX="10.0" layoutY="66.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showTransaksi" style="-fx-background-color: #FF9800; -fx-font-weight: bold;" text="Kasir/Transaksi" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showLaporan" style="-fx-background-color: #9C27B0; -fx-font-weight: bold;" text="Laporan" textFill="WHITE" />
+            <Button layoutX="10.0" layoutY="92.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLogout" style="-fx-background-color: #F44336;" text="LOGOUT" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Button>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </left>
+   <center>
+      <Label text="Selamat Datang di LumbungKita" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Label>
+   </center>
+</BorderPane>
