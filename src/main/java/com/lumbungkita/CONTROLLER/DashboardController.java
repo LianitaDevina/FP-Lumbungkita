@@ -59,6 +59,11 @@ public class DashboardController {
     void showLaporan(ActionEvent event) {
         loadPage("LaporanView");
     }
+        
+    @FXML
+    void showHasilPanen(ActionEvent event) {
+        loadPage("HasilPanenView");
+    }
 
     // method untuk logout dan kembali ke layar login
     @FXML
