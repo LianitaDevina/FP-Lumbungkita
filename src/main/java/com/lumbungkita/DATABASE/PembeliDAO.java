@@ -7,8 +7,6 @@ import com.lumbungkita.MODEL.Pembeli;
 
 public class PembeliDAO {
 
-    // --- CRUD YANG SUDAH ADA (TETAP) ---
-
     public List<Pembeli> getAllPembeli() {
         List<Pembeli> list = new ArrayList<>();
         String sql = "SELECT * FROM pembeli";
@@ -67,10 +65,8 @@ public class PembeliDAO {
             e.printStackTrace();
         }
     }
-
-    // --- TAMBAHAN PENTING UNTUK TRANSAKSI ---
     
-    // Method untuk mengecek tipe pembeli (UMUM / RESELLER) berdasarkan ID
+    // Method untuk mengecek tipe pembeli (umum / reseller) berdasarkan ID
     public String getTipePembeli(int idPembeli) {
         String tipe = null;
         String sql = "SELECT tipe_pembeli FROM pembeli WHERE id_pembeli = ?";
@@ -87,6 +83,7 @@ public class PembeliDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return tipe; // Mengembalikan "UMUM", "RESELLER", atau null jika tidak ketemu
+        return tipe; 
     }
+
 }
