@@ -21,9 +21,6 @@ public class DashboardController {
 
         // blok try-catch untuk memuat file FXML
         try {
-            // PERBAIKAN DI SINI:
-            // Tambahkan "/com/lumbungkita/" agar mencari dari folder resources utama
-            // bukan dari folder CONTROLLER
             root = FXMLLoader.load(getClass().getResource("/com/lumbungkita/" + page + ".fxml"));
         } catch (IOException e) {
             System.err.println("Gagal memuat halaman: " + page);
@@ -45,7 +42,7 @@ public class DashboardController {
     // method untuk menampilkan halaman Pembeli
     @FXML
     void showPembeli(ActionEvent event) {
-        System.out.println("Menu Pembeli diklik (File belum ada)");
+        loadPage("PembeliView");
     }
     
     // method untuk menampilkan halaman Transaksi
