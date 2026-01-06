@@ -65,7 +65,6 @@ public class TransaksiController {
     // --- ACTION: TOMBOL TAMBAH ---
     @FXML
     private void handleTambah() {
-        // 1. Validasi Input Kosong
         if (tfIdPanen.getText().isEmpty() || tfJumlah.getText().isEmpty()) {
             showAlert("Peringatan", "ID Panen dan Jumlah harus diisi.");
             return;
@@ -75,13 +74,11 @@ public class TransaksiController {
             int idPanen = Integer.parseInt(tfIdPanen.getText());
             int jumlahBeli = Integer.parseInt(tfJumlah.getText());
 
-            // 2. Validasi Jumlah Positif
             if (jumlahBeli <= 0) {
                 showAlert("Peringatan", "Jumlah pembelian harus lebih dari 0.");
                 return;
             }
 
-            // 3. Cek Database
             HasilPanen panen = hasilPanenDAO.getHasilPanenById(idPanen);
             
             if (panen == null) {
@@ -89,13 +86,11 @@ public class TransaksiController {
                 return;
             }
 
-            // 4. Cek Stok
             if (jumlahBeli > panen.getStok()) {
                 showAlert("Stok Kurang", "Stok " + panen.getNamaHasilPanen() + " sisa: " + panen.getStok());
                 return;
             }
 
-            // 5. Masukkan ke Keranjang
             KeranjangItem item = new KeranjangItem(
                 panen.getIdPanen(),
                 panen.getNamaHasilPanen(),
@@ -106,7 +101,6 @@ public class TransaksiController {
             listKeranjang.add(item);
             hitungTotal();
 
-            // 6. Reset Input Barang
             tfIdPanen.clear();
             tfJumlah.clear();
             tfIdPanen.requestFocus(); 
@@ -119,7 +113,6 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL HAPUS ITEM ---
     @FXML
     private void handleHapusItem() {
         KeranjangItem selected = tblKeranjang.getSelectionModel().getSelectedItem();
@@ -131,7 +124,6 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL CHECKOUT ---
     @FXML
     private void handleCheckout() {
         if (listKeranjang.isEmpty()) {
@@ -147,17 +139,21 @@ public class TransaksiController {
             int idPembeli = Integer.parseInt(tfIdPembeli.getText());
             List<DetailTransaksi> listDetail = new ArrayList<>();
 
-            // Konversi dari ObservableList ke List<DetailTransaksi>
+            // Siapkan Data Detail
             for (KeranjangItem item : listKeranjang) {
-                // Constructor DetailTransaksi
                 listDetail.add(new DetailTransaksi(0, item.getQuantity(), item.getSubtotal(), 0, item.getIdPanen()));
             }
 
-            // Simpan ke Database
+            // 1. Simpan Transaksi
             boolean sukses = transaksiDAO.simpanTransaksi(idPembeli, totalBayarBersih, listDetail);
 
             if (sukses) {
-                showAlert("Berhasil", "Transaksi berhasil disimpan!");
+                for (KeranjangItem item : listKeranjang) {
+                    hasilPanenDAO.kurangiStok(item.getIdPanen(), item.getQuantity());
+                }
+                
+
+                showAlert("Berhasil", "Transaksi disimpan & Stok otomatis diperbarui!");
                 resetForm();
             } else {
                 showAlert("Gagal", "Terjadi kesalahan saat menyimpan ke database.");
