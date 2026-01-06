@@ -14,7 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class LaporanController {
 
-    // untuk menghubungkan elemen FXML
+    // laporan stok gudang
     @FXML private TableView<LaporanStok> tabelStok;
     @FXML private TableColumn<LaporanStok, String> colStokNama;
     @FXML private TableColumn<LaporanStok, String> colStokJenis;
@@ -22,14 +22,15 @@ public class LaporanController {
     @FXML private TableColumn<LaporanStok, Integer> colStokSisa;
     @FXML private TableColumn<LaporanStok, String> colStokPetani;
 
-    // untuk menghubungkan elemen FXML tab Laporan Penjualan
+    // riwayat transaksi
     @FXML private TableView<LaporanPenjualan> tabelPenjualan;
     @FXML private TableColumn<LaporanPenjualan, Integer> colJualID;
     @FXML private TableColumn<LaporanPenjualan, String> colJualTanggal;
     @FXML private TableColumn<LaporanPenjualan, String> colJualPembeli;
     @FXML private TableColumn<LaporanPenjualan, Double> colJualTotal;
+    @FXML private TableColumn<LaporanPenjualan, Integer> colJualQty; 
 
-    // untuk menghubungkan elemen FXML tab Laporan Per Produk
+    // kualitas produk
     @FXML private TableView<LaporanPerProduk> tabelProduk;
     @FXML private TableColumn<LaporanPerProduk, String> colProdukNama;      
     @FXML private TableColumn<LaporanPerProduk, Integer> colProdukTerjual;  
@@ -47,7 +48,7 @@ public class LaporanController {
         initTabelProduk();
     }
 
-    // inisialisasi tabel laporan stok  
+    // Inisialisasi Tabel Stok
     private void initTabelStok() {
         colStokNama.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
         colStokJenis.setCellValueFactory(new PropertyValueFactory<>("jenisBarang"));
@@ -58,17 +59,18 @@ public class LaporanController {
         tabelStok.setItems(FXCollections.observableArrayList(laporanDAO.getLaporanStok()));
     }
 
-    // inisialisasi tabel laporan penjualan
+    // Inisialisasi Tabel Penjualan (Riwayat Transaksi)
     private void initTabelPenjualan() {
         colJualID.setCellValueFactory(new PropertyValueFactory<>("idTransaksi"));
         colJualTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
         colJualPembeli.setCellValueFactory(new PropertyValueFactory<>("namaPembeli"));
         colJualTotal.setCellValueFactory(new PropertyValueFactory<>("totalHarga"));
+        colJualQty.setCellValueFactory(new PropertyValueFactory<>("totalQty"));
 
         tabelPenjualan.setItems(FXCollections.observableArrayList(laporanDAO.getLaporanPenjualan()));
     }
 
-    // inisialisasi tabel laporan per produk
+    // Inisialisasi Tabel Produk
     private void initTabelProduk() {
         colProdukNama.setCellValueFactory(new PropertyValueFactory<>("namaProduk"));
         colProdukTerjual.setCellValueFactory(new PropertyValueFactory<>("totalTerjual"));
