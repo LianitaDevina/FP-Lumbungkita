@@ -7,18 +7,21 @@ public class LaporanPenjualan {
     private Timestamp tanggal;
     private String namaPembeli;
     private double totalHarga;
+    private int totalQty; 
 
-    // konstruktor LaporanPenjualan
-    public LaporanPenjualan(int idTransaksi, Timestamp tanggal, String namaPembeli, double totalHarga) {
+    // konstruktor 
+    public LaporanPenjualan(int idTransaksi, Timestamp tanggal, String namaPembeli, double totalHarga, int totalQty) {
         this.idTransaksi = idTransaksi;
         this.tanggal = tanggal;
         this.namaPembeli = namaPembeli;
         this.totalHarga = totalHarga;
+        this.totalQty = totalQty;
     }
 
-    // getter untuk atribut
+    // getter
     public int getIdTransaksi() { return idTransaksi; }
     public Timestamp getTanggal() { return tanggal; }
     public String getNamaPembeli() { return namaPembeli; }
     public double getTotalHarga() { return totalHarga; }
+    public int getTotalQty() { return totalQty; } 
 }
