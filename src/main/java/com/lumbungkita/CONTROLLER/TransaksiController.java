@@ -15,13 +15,13 @@ import java.util.List;
 
 public class TransaksiController {
 
-    // --- KOMPONEN FXML ---
+    // Komponen FXML 
     @FXML private TextField tfIdPembeli;
     @FXML private TextField tfIdPanen;
     @FXML private TextField tfJumlah;
     @FXML private Label lblTotalBayar;
 
-    // Tabel Keranjang
+    // Tabel keranjang
     @FXML private TableView<KeranjangItem> tblKeranjang;
     @FXML private TableColumn<KeranjangItem, Integer> colIdBrg;
     @FXML private TableColumn<KeranjangItem, String> colNamaBrg;
@@ -29,7 +29,7 @@ public class TransaksiController {
     @FXML private TableColumn<KeranjangItem, Integer> colQty;
     @FXML private TableColumn<KeranjangItem, Double> colSubtotal;
 
-    // --- VARIABEL DATA ---
+    // Variabel data
     private TransaksiDAO transaksiDAO;
     private HasilPanenDAO hasilPanenDAO;
     private ObservableList<KeranjangItem> listKeranjang;
@@ -38,22 +38,22 @@ public class TransaksiController {
     @FXML
     public void initialize() {
         try {
-            // Inisialisasi DAO & List
+            // Inisialisasi DAO & list
             transaksiDAO = new TransaksiDAO();
             hasilPanenDAO = new HasilPanenDAO();
             listKeranjang = FXCollections.observableArrayList();
 
-            // Setup Kolom Tabel
+            // Setup kolom tabel
             colIdBrg.setCellValueFactory(new PropertyValueFactory<>("idPanen"));
             colNamaBrg.setCellValueFactory(new PropertyValueFactory<>("namaPanen"));
             colHargaBrg.setCellValueFactory(new PropertyValueFactory<>("hargaSatuan"));
             colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             colSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
 
-            // Hubungkan List ke Tabel
+            // Hubungkan list ke tabel
             tblKeranjang.setItems(listKeranjang);
             
-            // Set Total Awal
+            // Set total awal
             lblTotalBayar.setText("Rp 0,00");
 
         } catch (Exception e) {
@@ -62,7 +62,6 @@ public class TransaksiController {
         }
     }
 
-    // --- ACTION: TOMBOL TAMBAH ---
     @FXML
     private void handleTambah() {
         if (tfIdPanen.getText().isEmpty() || tfJumlah.getText().isEmpty()) {
@@ -188,3 +187,4 @@ public class TransaksiController {
         alert.showAndWait();
     }
 }
+
