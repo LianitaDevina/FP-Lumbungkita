@@ -6,18 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
-
-/**
- * JavaFX App
- */
 public class App extends Application {
 
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws IOException {
-        // Halaman pertama yang dibuka saat aplikasi dijalankan (LoginView)
-        // Ukuran jendela diatur ke 900x600 pixel
         scene = new Scene(loadFXML("LoginView"), 900, 600);
         
         stage.setScene(scene);
@@ -25,8 +19,7 @@ public class App extends Application {
         stage.show();
     }
 
-    // Method statis untuk mengganti tampilan (pindah halaman)
-    // Dipanggil dengan: App.setRoot("NamaFileFXML");
+    // Method statis untuk mengganti tampilan
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
