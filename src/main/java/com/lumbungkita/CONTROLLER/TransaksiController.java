@@ -1,7 +1,7 @@
 package com.lumbungkita.CONTROLLER;
 
 import com.lumbungkita.DATABASE.HasilPanenDAO;
-import com.lumbungkita.DATABASE.PembeliDAO; // <--- Import Baru
+import com.lumbungkita.DATABASE.PembeliDAO; 
 import com.lumbungkita.DATABASE.TransaksiDAO;
 import com.lumbungkita.MODEL.DetailTransaksi;
 import com.lumbungkita.MODEL.HasilPanen;
@@ -218,3 +218,4 @@ public class TransaksiController {
         alert.showAndWait();
     }
 }
+
