@@ -8,10 +8,10 @@ public class TransaksiDAO {
 
     public boolean simpanTransaksi(int idPembeli, double totalHarga, List<DetailTransaksi> listDetail) {
         
-        // 1. QUERY HEADER
+        // Query header
         String sqlHeader = "INSERT INTO transaksi (id_pembeli, total_harga_transaksi) VALUES (?, ?)";
         
-        // 2. QUERY DETAIL
+        // Query detail
         String sqlDetail = "INSERT INTO detail_transaksi (id_transaksi, id_panen, jumlah_pembelian, harga_saat_transaksi) VALUES (?, ?, ?, ?)";
         
         Connection conn = null;
@@ -20,9 +20,9 @@ public class TransaksiDAO {
 
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Mulai Transaksi
+            conn.setAutoCommit(false); // Memulai Transaksi
 
-            // --- TAHAP 1: SIMPAN HEADER ---
+            // Simpan heaader
             psHeader = conn.prepareStatement(sqlHeader, Statement.RETURN_GENERATED_KEYS);
             psHeader.setInt(1, idPembeli);
             psHeader.setDouble(2, totalHarga); // Masuk ke total_harga_transaksi
@@ -42,7 +42,7 @@ public class TransaksiDAO {
                 }
             }
 
-            // --- TAHAP 2: SIMPAN DETAIL ---
+            // Simpan detail
             psDetail = conn.prepareStatement(sqlDetail);
             
             for (DetailTransaksi dt : listDetail) {
@@ -69,4 +69,5 @@ public class TransaksiDAO {
             if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
         }
     }
+
 }
