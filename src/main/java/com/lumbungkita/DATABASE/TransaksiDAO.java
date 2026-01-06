@@ -20,7 +20,7 @@ public class TransaksiDAO {
 
         try {
             conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // Memulai Transaksi
+            conn.setAutoCommit(false); // Mulai transaksi
 
             // Simpan heaader
             psHeader = conn.prepareStatement(sqlHeader, Statement.RETURN_GENERATED_KEYS);
@@ -32,7 +32,7 @@ public class TransaksiDAO {
                 throw new SQLException("Gagal menyimpan header transaksi.");
             }
 
-            // Ambil ID Transaksi yang baru dibuat
+            // Ambil ID transaksi yang baru dibuat
             int idTransaksiBaru = 0;
             try (ResultSet rs = psHeader.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -55,7 +55,7 @@ public class TransaksiDAO {
             
             psDetail.executeBatch(); 
 
-            conn.commit(); // Menyimpan Permanen
+            conn.commit(); // Simpan permanen
             return true;
 
         } catch (SQLException e) {
@@ -71,3 +71,4 @@ public class TransaksiDAO {
     }
 
 }
+
